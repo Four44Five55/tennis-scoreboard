@@ -16,6 +16,8 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.7.7'
     implementation 'com.zaxxer:HikariCP:5.1.0'
 
+    implementation 'org.hibernate.orm:hibernate-core:6.2.5.Final'
+
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
 
     testImplementation platform('org.junit:junit-bom:5.10.0')

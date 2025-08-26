@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd"
+             version="3.1">
+
+    <!-- 1. Persistence Unit (Блок настроек) -->
+    <persistence-unit name="tennis" transaction-type="RESOURCE_LOCAL">
+
+        <!-- 2. Провайдер JPA -->
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <!-- 3. Список классов-сущностей -->
+        <class>org.example.model.Player</class>
+        <class>org.example.model.Match</class>
+        <!-- Если добавим Score, его тоже нужно будет сюда вписать -->
+
+        <!-- 4. Свойства для подключения и настройки Hibernate -->
+        <properties>
+            <!-- === Настройки подключения к БД === -->
+            <!-- Эти параметры Hibernate передаст своему внутреннему пулу соединений -->
+
+            <!-- JDBC Драйвер для PostgreSQL -->
+            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <!-- URL для подключения к нашей базе в Docker (проверьте порт!) -->
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:54793/tennis_db"/>
+            <!-- Пользователь -->
+            <property name="jakarta.persistence.jdbc.user" value="tennis_user"/>
+            <!-- Пароль -->
+            <property name="jakarta.persistence.jdbc.password" value="test"/>
+
+            <!-- === Настройки специфичные для Hibernate === -->
+
+            <!-- Диалект SQL. Очень важный параметр! -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+
+            <!-- Показывать сгенерированный SQL в консоли. НЕВЕРОЯТНО полезно для отладки! -->
+            <property name="hibernate.show_sql" value="true"/>
+
+            <!-- Форматировать SQL в консоли, чтобы его было удобно читать. -->
+            <property name="hibernate.format_sql" value="true"/>
+
+            <!-- Стратегия генерации/обновления схемы БД. -->
+            <!-- 'validate': Проверять, что схема БД соответствует сущностям. Если нет - ошибка. (Для продакшена) -->
+            <!-- 'update': Автоматически добавлять/изменять колонки и таблицы. (Удобно для разработки) -->
+            <!-- 'create': Каждый раз удалять и создавать всю схему заново. (Для тестов) -->
+            <!-- 'create-drop': То же, что и create, но удаляет схему при закрытии сессии. (Для тестов) -->
+            <!-- 'none': Ничего не делать. (Стандарт для продакшена, где схемой управляют миграции) -->
+            <property name="hibernate.hbm2ddl.auto" value="validate"/>
+        </properties>
+
+    </persistence-unit>
+</persistence>
