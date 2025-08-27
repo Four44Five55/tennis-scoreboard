@@ -18,16 +18,14 @@
         <!-- 4. Свойства для подключения и настройки Hibernate -->
         <properties>
             <!-- === Настройки подключения к БД === -->
-            <!-- Эти параметры Hibernate передаст своему внутреннему пулу соединений -->
 
-            <!-- JDBC Драйвер для PostgreSQL -->
-            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <!-- URL для подключения к нашей базе в Docker (проверьте порт!) -->
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:54793/tennis_db"/>
-            <!-- Пользователь -->
-            <property name="jakarta.persistence.jdbc.user" value="tennis_user"/>
-            <!-- Пароль -->
-            <property name="jakarta.persistence.jdbc.password" value="test"/>
+            <!-- Это нестандартное свойство, специфичное для Hibernate -->
+            <property name="hibernate.connection.provider_class" value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
+
+            <!-- Теперь мы настраиваем сам HikariCP через его собственные свойства -->
+            <property name="hibernate.hikari.dataSource.url" value="jdbc:postgresql://localhost:54793/tennis_db"/>
+            <property name="hibernate.hikari.dataSource.user" value="tennis_user"/>
+            <property name="hibernate.hikari.dataSource.password" value="test"/>
 
             <!-- === Настройки специфичные для Hibernate === -->
 
