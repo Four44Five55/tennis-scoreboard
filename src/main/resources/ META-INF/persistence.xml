@@ -13,29 +13,22 @@
         <!-- 3. Список классов-сущностей -->
         <class>org.example.model.Player</class>
         <class>org.example.model.Match</class>
-        <!-- Если добавим Score, его тоже нужно будет сюда вписать -->
 
         <!-- 4. Свойства для подключения и настройки Hibernate -->
         <properties>
             <!-- === Настройки подключения к БД === -->
-
-            <!-- Это нестандартное свойство, специфичное для Hibernate -->
-            <property name="hibernate.connection.provider_class" value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
-
-            <!-- Теперь мы настраиваем сам HikariCP через его собственные свойства -->
-            <property name="hibernate.hikari.dataSource.url" value="jdbc:postgresql://localhost:54793/tennis_db"/>
-            <property name="hibernate.hikari.dataSource.user" value="tennis_user"/>
-            <property name="hibernate.hikari.dataSource.password" value="test"/>
-
-            <!-- === Настройки специфичные для Hibernate === -->
+            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:54793/tennis_db"/>
+            <property name="jakarta.persistence.jdbc.user" value="tennis_user"/>
+            <property name="jakarta.persistence.jdbc.password" value="test"/>
 
             <!-- Диалект SQL. Очень важный параметр! -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
 
-            <!-- Показывать сгенерированный SQL в консоли. НЕВЕРОЯТНО полезно для отладки! -->
+            <!-- Показывать сгенерированный SQL в консоли. -->
             <property name="hibernate.show_sql" value="true"/>
 
-            <!-- Форматировать SQL в консоли, чтобы его было удобно читать. -->
+            <!-- Форматировать SQL в консоли. -->
             <property name="hibernate.format_sql" value="true"/>
 
             <!-- Стратегия генерации/обновления схемы БД. -->
