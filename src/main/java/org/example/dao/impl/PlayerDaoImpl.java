@@ -21,7 +21,7 @@ public class PlayerDaoImpl implements PlayerDAO {
             manager.getTransaction().begin(); //старт транзакции. обязательно для всего, что меняет данные
             manager.merge(player);//если запись есть, то он обновит ее, если нет создаст
             manager.getTransaction().commit(); //только здесь вносятся изменения в БД
-        } catch (Exception e) {
+        } catch (PersistenceException e) {
             //при ошибке откатывем все изменения
             if (manager.getTransaction().isActive()) {
                 manager.getTransaction().rollback();
@@ -41,6 +41,8 @@ public class PlayerDaoImpl implements PlayerDAO {
         try {
             Player player = manager.find(Player.class, id);
             return Optional.ofNullable(player);
+        } catch (PersistenceException e) {
+            throw new DataAccessException("Error finding player: " + id, e);
         } finally {
             manager.close();
         }
@@ -57,6 +59,8 @@ public class PlayerDaoImpl implements PlayerDAO {
             return Optional.of(p);
         } catch (NoResultException e) {
             return Optional.empty();
+        } catch (PersistenceException e) {
+            throw new DataAccessException("Error finding player: " + name, e);
         } finally {
             manager.close();
         }
@@ -67,6 +71,8 @@ public class PlayerDaoImpl implements PlayerDAO {
         EntityManager manager = HibernateUtil.getEntityManager();
         try {
             return manager.createQuery("SELECT p FROM Player p", Player.class).getResultList();
+        } catch (PersistenceException e) {
+            throw new DataAccessException("Error finding players", e);
         } finally {
             manager.close();
         }
