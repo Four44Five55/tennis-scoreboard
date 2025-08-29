@@ -8,7 +8,9 @@ public class HibernateUtil {
     private HibernateUtil() {
     }
 
-    private static final EntityManagerFactory emf = buildEntityManagerFactory();
+    private static final EntityManagerFactory managerFactory = buildEntityManagerFactory();
+
+    private static final ThreadLocal<EntityManager> threadLocal = new ThreadLocal<>();
 
     /**
      * Создает фабрику
@@ -26,15 +28,28 @@ public class HibernateUtil {
      * Создает контекст для работы с БД
      */
     public static EntityManager getEntityManager() {
-        return emf.createEntityManager();
+        EntityManager manager = threadLocal.get();
+        if (manager == null || !manager.isOpen()) {
+            manager = managerFactory.createEntityManager();
+            threadLocal.set(manager);
+        }
+        return manager;
+    }
+
+    public static void closeEntityManager() {
+        EntityManager manager = threadLocal.get();
+        if (manager != null && manager.isOpen()) {
+            manager.close();
+        }
+        threadLocal.remove();
     }
 
     /**
      * Метод закрытия ресурсов работы с БД, по завершению работы веб-приложения.
      */
     public static void shutdown() {
-        if (emf != null && emf.isOpen()) {
-            emf.close();
+        if (managerFactory != null && managerFactory.isOpen()) {
+            managerFactory.close();
         }
     }
 
