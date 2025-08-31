@@ -7,14 +7,11 @@
     <!-- 1. Persistence Unit (Блок настроек) -->
     <persistence-unit name="tennis" transaction-type="RESOURCE_LOCAL">
 
-        <!-- 2. Провайдер JPA -->
-        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-
-        <!-- 3. Список классов-сущностей -->
+        <!-- 2. Список классов-сущностей -->
         <class>org.example.model.Player</class>
         <class>org.example.model.Match</class>
 
-        <!-- 4. Свойства для подключения и настройки Hibernate -->
+        <!-- 3. Свойства для подключения и настройки Hibernate -->
         <properties>
             <!-- === Настройки подключения к БД === -->
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
