@@ -38,6 +38,16 @@
             <!-- 'create-drop': То же, что и create, но удаляет схему при закрытии сессии. (Для тестов) -->
             <!-- 'none': Ничего не делать. (Стандарт для продакшена, где схемой управляют миграции) -->
             <property name="hibernate.hbm2ddl.auto" value="validate"/>
+
+            <!-- Настройка пула соединений -->
+            <property name="hibernate.connection.provider_class"
+                      value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
+
+            <!-- Настройки HikariCP -->
+            <property name="hibernate.hikari.minimumIdle" value="5"/>
+            <property name="hibernate.hikari.maximumPoolSize" value="10"/>
+            <property name="hibernate.hikari.idleTimeout" value="30000"/>
+            <property name="hibernate.hikari.connectionTimeout" value="20000"/>
         </properties>
 
     </persistence-unit>
