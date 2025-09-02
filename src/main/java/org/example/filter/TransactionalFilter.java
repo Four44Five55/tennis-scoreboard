@@ -1,43 +1,54 @@
 package org.example.filter;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpServletRequest;
 import org.example.util.HibernateUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.servlet.*;
-import javax.servlet.annotation.WebServlet;
 import java.io.IOException;
 
-@WebServlet("/*")
+@WebFilter("/api/*")
 public class TransactionalFilter implements Filter {
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        Filter.super.init(filterConfig);
-    }
+
+    private static final Logger logger = LoggerFactory.getLogger(TransactionalFilter.class);
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         EntityManager manager = null;
+        EntityTransaction transaction = null;
         try {
             manager = HibernateUtil.getEntityManager();
-            manager.getTransaction().begin();
+            transaction = manager.getTransaction();
+
+            transaction.begin();
 
             chain.doFilter(request, response);
 
-            if (manager.getTransaction().isActive()) {
-                manager.getTransaction().commit();
+            if (transaction.isActive()) {
+                transaction.commit();
             }
+
         } catch (Exception e) {
-            if (manager.getTransaction().isActive()) {
-                manager.getTransaction().rollback();
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
             }
-            throw new ServletException(e);
+            String uri = ((HttpServletRequest) request).getRequestURI();
+            logger.error("Транзакция не удалась для URL: {}", uri, e);
+            throw new ServletException("Ошибка транзакции.", e);
         } finally {
             HibernateUtil.closeEntityManager();
         }
     }
 
     @Override
+    public void init(FilterConfig filterConfig) {
+    }
+
+    @Override
     public void destroy() {
-        Filter.super.destroy();
     }
 }

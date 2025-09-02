@@ -1,13 +1,12 @@
 package org.example.service;
 
-import org.example.dao.PlayerDAO;
-import org.example.dao.impl.PlayerDaoImpl;
 import org.example.model.Player;
 
-public class PlayerService {
-    private final PlayerDAO player = new PlayerDaoImpl();
+import java.util.List;
+import java.util.Optional;
 
-    public Player addPlayer(String name) {
-
-    }
+public interface PlayerService {
+    void createOrUpdatePlayer(Player player);
+    Optional<Player> getPlayerByName(String name);
+    List<Player> getAllPlayers();
 }

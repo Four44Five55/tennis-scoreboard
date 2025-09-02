@@ -1,9 +1,8 @@
-package org.example.dao.impl;
+package org.example.dao;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceException;
-import org.example.dao.PlayerDAO;
 import org.example.exception.DataAccessException;
 import org.example.exception.DuplicateEntityException;
 import org.example.model.Player;
@@ -21,45 +20,46 @@ public class PlayerDaoImpl implements PlayerDAO {
             manager.merge(player);
         } catch (PersistenceException e) {
             if (e.getCause() instanceof ConstraintViolationException) {
-                throw new DuplicateEntityException("Duplicate entity: " + player);
+                throw new DuplicateEntityException("Дублирование сущности: " + player);
             }
-            throw new DataAccessException("Error saving player: " + player, e);
+            throw new DataAccessException("Ошибка сохранения игрока: " + player, e);
         }
     }
 
     @Override
     public Optional<Player> findById(int id) {
+        EntityManager manager = HibernateUtil.getEntityManager();
         try {
-            EntityManager manager = HibernateUtil.getEntityManager();
             Player player = manager.find(Player.class, id);
             return Optional.ofNullable(player);
         } catch (PersistenceException e) {
-            throw new DataAccessException("Error finding player: " + id, e);
+            throw new DataAccessException("Ошибка поиска игрока: " + id, e);
         }
     }
 
     @Override
     public Optional<Player> findByName(String name) {
+        EntityManager manager = HibernateUtil.getEntityManager();
         try {
-            EntityManager manager = HibernateUtil.getEntityManager();
-            Player p = (Player) manager.createQuery("SELECT p FROM Player p WHERE p.name=:name")
+                     Player p = (Player) manager.createQuery("SELECT p FROM Player p WHERE p.name=:name")
                     .setParameter("name", name)
                     .getSingleResult();
             return Optional.of(p);
         } catch (NoResultException e) {
             return Optional.empty();
         } catch (PersistenceException e) {
-            throw new DataAccessException("Error finding player: " + name, e);
+            throw new DataAccessException("Ошибка поиска игрока: " + name, e);
         }
     }
 
     @Override
     public List<Player> findAll() {
+        EntityManager manager = HibernateUtil.getEntityManager();
         try {
-            EntityManager manager = HibernateUtil.getEntityManager();
+
             return manager.createQuery("SELECT p FROM Player p", Player.class).getResultList();
         } catch (PersistenceException e) {
-            throw new DataAccessException("Error finding players", e);
+            throw new DataAccessException("Ошибка поиска игроков", e);
         }
     }
 }
