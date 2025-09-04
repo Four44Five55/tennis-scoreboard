@@ -1,6 +1,6 @@
 package org.example.exception;
 
-public class InitializationException extends RuntimeException {
+public final class InitializationException extends RuntimeException {
     public InitializationException(String message) {
         super(message);
     }

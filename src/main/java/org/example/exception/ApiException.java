@@ -2,7 +2,7 @@ package org.example.exception;
 
 import java.util.Map;
 
-public class ApiException extends RuntimeException {
+public abstract class ApiException extends RuntimeException {
     private final int status;
     private final String code;
     private final Map<String, ?> details;
