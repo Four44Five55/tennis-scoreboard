@@ -1,7 +1,14 @@
 package org.example.exception;
 
-public class DataAccessException extends RuntimeException {
+import jakarta.servlet.http.HttpServletResponse;
+
+//500
+public class DataAccessException extends ApiException {
+    public DataAccessException(String message) {
+        super(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "db_error", message);
+    }
+
     public DataAccessException(String message, Throwable cause) {
-        super(message, cause);
+        super(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "db_error", message, cause);
     }
 }

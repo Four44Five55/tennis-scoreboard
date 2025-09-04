@@ -3,8 +3,8 @@ package org.example.dao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceException;
+import org.example.exception.ConflictException;
 import org.example.exception.DataAccessException;
-import org.example.exception.DuplicateEntityException;
 import org.example.model.Player;
 import org.example.util.HibernateUtil;
 import org.hibernate.exception.ConstraintViolationException;
@@ -20,7 +20,7 @@ public class PlayerDaoImpl implements PlayerDAO {
             manager.merge(player);
         } catch (PersistenceException e) {
             if (e.getCause() instanceof ConstraintViolationException) {
-                throw new DuplicateEntityException("Дублирование сущности: " + player);
+                throw new ConflictException("Дублирование сущности: " + player);
             }
             throw new DataAccessException("Ошибка сохранения игрока: " + player, e);
         }
