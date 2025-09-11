@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd"
+             version="3.1">
+
+    <!-- 1. Persistence Unit (Блок настроек) -->
+    <persistence-unit name="tennis" transaction-type="RESOURCE_LOCAL">
+
+        <!-- 2. Провайдер JPA (ФИКС: Добавлен, чтобы JPA нашёл Hibernate) -->
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <!-- 3. Список классов-сущностей -->
+        <class>org.example.model.Player</class>
+        <class>org.example.model.Match</class>
+
+        <!-- 4. Свойства для подключения и настройки Hibernate -->
+        <properties>
+            <!-- === Настройки подключения к БД === -->
+            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:54793/tennis_db"/>
+            <property name="jakarta.persistence.jdbc.user" value="tennis_user"/>
+            <property name="jakarta.persistence.jdbc.password" value="test"/>
+
+            <!-- Диалект SQL. Очень важный параметр! -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+
+            <!-- Показывать сгенерированный SQL в консоли. -->
+            <property name="hibernate.show_sql" value="true"/>
+
+            <!-- Форматировать SQL в консоли. -->
+            <property name="hibernate.format_sql" value="true"/>
+
+            <!-- Стратегия генерации/обновления схемы БД (ФИКС: Для dev на "update" — авто-создаст таблицы) -->
+            <property name="hibernate.hbm2ddl.auto" value="update"/>  <!-- Измените на "validate" для прод -->
+
+            <!-- Настройка пула соединений -->
+            <property name="hibernate.connection.provider_class"
+                      value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
+
+            <!-- Настройки HikariCP -->
+            <property name="hibernate.hikari.minimumIdle" value="5"/>
+            <property name="hibernate.hikari.maximumPoolSize" value="10"/>
+            <property name="hibernate.hikari.idleTimeout" value="30000"/>
+            <property name="hibernate.hikari.connectionTimeout" value="20000"/>
+        </properties>
+
+    </persistence-unit>
+</persistence>
