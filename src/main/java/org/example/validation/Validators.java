@@ -1,15 +1,14 @@
 package org.example.validation;
 
-import org.example.exception.ValidationException;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.regex.Pattern;
+import java.text.Normalizer;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public final class Validators {
     private static final Set<String> BAD_WORDS = loadBadWords();
+
     private Validators() {
     }
 
@@ -40,6 +39,7 @@ public final class Validators {
             e.add(field, msg);
         }
     }
+
     private static Set<String> loadBadWords() {
         Set<String> words = new HashSet<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -49,23 +49,46 @@ public final class Validators {
                 words.add(line.trim().toLowerCase());  // Add, normalize to lower
             }
         } catch (Exception e) {
-            // Log or handle (e.g., empty list if file missing)
-            System.err.println("Failed to load badwords.txt: " + e.getMessage());  // Or use logger
+            System.err.println("Ошибка загрузки файла с нецензурной лексикой badwords.txt: " + e.getMessage());  // Or use logger
         }
         return words;
     }
 
-    public static void validateNoProfanity(String value, String fieldName) {
-        if (value == null) return;
+    public static void validateNoProfanity(Errors e, String field, String value) {
+        if (value == null || value.isBlank() || BAD_WORDS.isEmpty()) return;
 
-        String lowerValue = value.toLowerCase();
-        for (String bad : BAD_WORDS) {
-            Pattern pattern = Pattern.compile("\\b" + Pattern.quote(bad) + "\\b");
-            if (pattern.matcher(lowerValue).find()) {
-                throw new ValidationException("Invalid content in");
-                ex.addError(fieldName, "contains prohibited word");
-                throw ex;
+        String normalized = normalize(value);
+
+        for (String token : tokens(normalized)) {
+            if (BAD_WORDS.contains(token)) {
+                e.add(field, "Недопустимая лексика");
+                return;
             }
         }
+
+        String squeezed = normalized.replaceAll("[^\\p{L}]+", "");
+        for (String w : BAD_WORDS) {
+            if (squeezed.contains(w)) {
+                e.add(field, "Недопустимая лексика");
+                return;
+            }
+        }
+    }
+
+    private static String normalize(String s) {
+        String x = s.toLowerCase(Locale.ROOT).replace('ё', 'е');
+        x = Normalizer.normalize(x, Normalizer.Form.NFD).replaceAll("\\p{M}+", "");
+        // упрощённая “leet”-нормализация
+        x = x.replace('0', 'o').replace('@', 'a').replace('$', 's')
+                .replace('1', 'i').replace('3', 'e').replace('7', 't');
+        // схлопнуть слишком длинные повторы: “ооо” -> “оо”
+        return x.replaceAll("(\\p{L})\\1{2,}", "$1$1").trim();
+    }
+
+    private static List<String> tokens(String normalized) {
+        if (normalized.isBlank()) return List.of();
+        return Arrays.stream(normalized.split("[^\\p{L}]+"))
+                .filter(t -> !t.isBlank())
+                .collect(Collectors.toList());
     }
 }

@@ -19,13 +19,15 @@ public class ErrorFilter implements Filter {
 
         try {
             chain.doFilter(request, response);
-
         } catch (ApiException e) {
             if (resp.isCommitted()) throw new ServletException(e);
             resp.resetBuffer();
-            String msg = (e.getMessage() == null || e.getMessage().isBlank()) ? e.getCode() : e.getMessage();
-            JsonUtil.sendErrorResponse(resp, e.getStatus(), msg);
-
+            if (e instanceof org.example.exception.ValidationException ve) {
+                JsonUtil.sendValidationErrorResponse(resp, e.getStatus(), ve.getFieldErrors());
+            } else {
+                String msg = (e.getMessage() == null || e.getMessage().isBlank()) ? e.getCode() : e.getMessage();
+                JsonUtil.sendErrorResponse(resp, e.getStatus(), msg);
+            }
         } catch (Throwable t) {
             if (resp.isCommitted()) {
                 if (t instanceof ServletException se) throw se;
