@@ -1,7 +1,7 @@
 package org.example.service;
 
 import org.example.dao.PlayerDAO;
-import org.example.dao.PlayerDaoImpl;
+import org.example.dao.PlayerDAOImpl;
 import org.example.model.Player;
 import org.example.validation.PlayerValidator;
 
@@ -12,7 +12,7 @@ public class PlayerServiceImpl implements PlayerService {
     private final PlayerDAO playerDAO;
 
     public PlayerServiceImpl() {
-        this.playerDAO = new PlayerDaoImpl();
+        this.playerDAO = new PlayerDAOImpl();
     }
 
     @Override
