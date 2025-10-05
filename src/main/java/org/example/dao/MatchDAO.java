@@ -13,4 +13,9 @@ public interface MatchDAO {
     List<Match> findAll();
 
     List<Match> findByPlayerName(String name);
+
+    List<Match> findPaginated(int page, int pageSize);
+    long countAll();
+    List<Match> findPaginatedByPlayerName(String name, int page, int pageSize);
+    long countByPlayerName(String name);
 }

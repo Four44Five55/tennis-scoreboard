@@ -54,5 +54,64 @@ public class MatchDAOImpl implements MatchDAO {
             throw new DataAccessException("Ошибка поиска матчей по имени игрока: " + name, e);
         }
     }
+
+    @Override
+    public List<Match> findPaginated(int page, int pageSize) {
+        int offset = (page - 1) * pageSize;
+        String jpql = "SELECT m FROM Match m ORDER BY m.id DESC"; // ВАЖНО: Добавлена сортировка!
+
+        try {
+            EntityManager manager = HibernateUtil.getEntityManager();
+            return manager.createQuery(jpql, Match.class)
+                    .setFirstResult(offset)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+        } catch (PersistenceException e) {
+            throw new DataAccessException("Ошибка при поиске матчей с пагинацией (страница " + page + ")", e);
+        }
+    }
+
+    @Override
+    public long countAll() {
+        try {
+            EntityManager manager = HibernateUtil.getEntityManager();
+            Long count = manager.createQuery("SELECT COUNT(m) FROM Match m", Long.class)
+                    .getSingleResult();
+            return count != null ? count : 0L;
+        } catch (PersistenceException e) {
+            throw new DataAccessException("Ошибка подсчёта матчей", e);
+        }
+    }
+
+    @Override
+    public List<Match> findPaginatedByPlayerName(String name, int page, int pageSize) {
+        int offset = (page - 1) * pageSize;
+        String jpql = "SELECT m FROM Match m WHERE m.player1.name = :playerName OR m.player2.name = :playerName ORDER BY m.id DESC";
+
+        try {
+            EntityManager manager = HibernateUtil.getEntityManager();
+            return manager.createQuery(jpql, Match.class)
+                    .setParameter("playerName", name)
+                    .setFirstResult(offset)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+        } catch (PersistenceException e) {
+            throw new DataAccessException("Ошибка поиска матчей по имени игрока с пагинацией: " + name, e);
+        }
+    }
+
+    @Override
+    public long countByPlayerName(String name) {
+        String jpql = "SELECT COUNT(m) FROM Match m WHERE m.player1.name = :playerName OR m.player2.name = :playerName";
+
+        try {
+            EntityManager manager = HibernateUtil.getEntityManager();
+            return manager.createQuery(jpql, Long.class)
+                    .setParameter("playerName", name)
+                    .getSingleResult();
+        } catch (PersistenceException e) {
+            throw new DataAccessException("Ошибка подсчета матчей по имени игрока: " + name, e);
+        }
+    }
 }
 

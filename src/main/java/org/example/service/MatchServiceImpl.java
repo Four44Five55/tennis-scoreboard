@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.dao.MatchDAO;
 import org.example.dao.PlayerDAO;
+import org.example.dto.PaginatedResponseDTO;
 import org.example.exception.NotFoundException;
 import org.example.model.Match;
 import org.example.model.Player;
@@ -70,5 +71,60 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public Optional<Match> findById(int id) {
         return matchDAO.findById(id);
+    }
+
+    @Override
+    public PaginatedResponseDTO<Match> getPaginatedMatches(int page, int pageSize) {
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 10;
+        if (pageSize > 100) pageSize = 100;
+
+        List<Match> matches = matchDAO.findPaginated(page, pageSize);
+        long totalMatches = matchDAO.countAll();
+
+
+        int totalPages = (int) Math.ceil((double) totalMatches / pageSize);
+        if (totalPages == 0 && totalMatches > 0) {
+            totalPages = 1;
+        }
+
+        PaginatedResponseDTO<Match> response = new PaginatedResponseDTO<>();
+        response.setContent(matches);
+        response.setCurrentPage(page);
+        response.setPageSize(pageSize);
+        response.setTotalItems(totalMatches);
+        response.setTotalPages(totalPages);
+
+        return response;
+    }
+
+    @Override
+    public PaginatedResponseDTO<Match> getPaginatedMatchesByPlayerName(String playerName, int page, int pageSize) {
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 10;
+        if (pageSize > 100) pageSize = 100;
+
+        List<Match> matches = matchDAO.findPaginatedByPlayerName(playerName, page, pageSize);
+        long totalMatches = matchDAO.countByPlayerName(playerName);
+
+
+        int totalPages = (int) Math.ceil((double) totalMatches / pageSize);
+        if (totalPages == 0 && totalMatches > 0) {
+            totalPages = 1;
+        }
+
+        PaginatedResponseDTO<Match> response = new PaginatedResponseDTO<>();
+        response.setContent(matches);
+        response.setCurrentPage(page);
+        response.setPageSize(pageSize);
+        response.setTotalItems(totalMatches);
+        response.setTotalPages(totalPages);
+
+        return response;
+    }
+
+    @Override
+    public long countMatches() {
+        return matchDAO.countAll();
     }
 }
