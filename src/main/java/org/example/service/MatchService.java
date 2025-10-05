@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.dto.MatchResponseDTO;
 import org.example.dto.PaginatedResponseDTO;
 import org.example.model.Match;
 
@@ -18,8 +19,8 @@ public interface MatchService {
 
     Optional<Match> findById(int id);
 
-    PaginatedResponseDTO<Match> getPaginatedMatches(int page, int pageSize);
-    PaginatedResponseDTO<Match> getPaginatedMatchesByPlayerName(String playerName, int page, int pageSize);
+    PaginatedResponseDTO<MatchResponseDTO> getPaginatedMatches(int page, int pageSize);
+    PaginatedResponseDTO<MatchResponseDTO> getPaginatedMatchesByPlayerName(String playerName, int page, int pageSize);
 
     long countMatches();
 }

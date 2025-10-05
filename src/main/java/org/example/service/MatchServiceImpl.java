@@ -2,7 +2,9 @@ package org.example.service;
 
 import org.example.dao.MatchDAO;
 import org.example.dao.PlayerDAO;
+import org.example.dto.MatchResponseDTO;
 import org.example.dto.PaginatedResponseDTO;
+import org.example.dto.PlayerResponseDTO;
 import org.example.exception.NotFoundException;
 import org.example.model.Match;
 import org.example.model.Player;
@@ -10,6 +12,7 @@ import org.example.model.Player;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class MatchServiceImpl implements MatchService {
     private final MatchDAO matchDAO;
@@ -74,22 +77,25 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public PaginatedResponseDTO<Match> getPaginatedMatches(int page, int pageSize) {
+    public PaginatedResponseDTO<MatchResponseDTO> getPaginatedMatches(int page, int pageSize) {
         if (page < 1) page = 1;
         if (pageSize < 1) pageSize = 10;
         if (pageSize > 100) pageSize = 100;
 
-        List<Match> matches = matchDAO.findPaginated(page, pageSize);
+        List<Match> matchesFromDB = matchDAO.findPaginated(page, pageSize);
         long totalMatches = matchDAO.countAll();
 
+        List<MatchResponseDTO> matchDTOs = matchesFromDB.stream()
+                .map(this::mapToMatchDTO)
+                .collect(Collectors.toList());
 
-        int totalPages = (int) Math.ceil((double) totalMatches / pageSize);
-        if (totalPages == 0 && totalMatches > 0) {
-            totalPages = 1;
+        int totalPages = 0;
+        if (totalMatches > 0) {
+            totalPages = (int) Math.ceil((double) totalMatches / pageSize);
         }
 
-        PaginatedResponseDTO<Match> response = new PaginatedResponseDTO<>();
-        response.setContent(matches);
+        PaginatedResponseDTO<MatchResponseDTO> response = new PaginatedResponseDTO<>();
+        response.setContent(matchDTOs);
         response.setCurrentPage(page);
         response.setPageSize(pageSize);
         response.setTotalItems(totalMatches);
@@ -99,22 +105,26 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public PaginatedResponseDTO<Match> getPaginatedMatchesByPlayerName(String playerName, int page, int pageSize) {
+    public PaginatedResponseDTO<MatchResponseDTO> getPaginatedMatchesByPlayerName(String playerName, int page, int pageSize) {
+        // Валидация
         if (page < 1) page = 1;
         if (pageSize < 1) pageSize = 10;
         if (pageSize > 100) pageSize = 100;
 
-        List<Match> matches = matchDAO.findPaginatedByPlayerName(playerName, page, pageSize);
+        List<Match> matchesFromDB = matchDAO.findPaginatedByPlayerName(playerName, page, pageSize);
         long totalMatches = matchDAO.countByPlayerName(playerName);
 
+        List<MatchResponseDTO> matchDTOs = matchesFromDB.stream()
+                .map(this::mapToMatchDTO)
+                .collect(Collectors.toList());
 
-        int totalPages = (int) Math.ceil((double) totalMatches / pageSize);
-        if (totalPages == 0 && totalMatches > 0) {
-            totalPages = 1;
+        int totalPages = 0;
+        if (totalMatches > 0) {
+            totalPages = (int) Math.ceil((double) totalMatches / pageSize);
         }
 
-        PaginatedResponseDTO<Match> response = new PaginatedResponseDTO<>();
-        response.setContent(matches);
+        PaginatedResponseDTO<MatchResponseDTO> response = new PaginatedResponseDTO<>();
+        response.setContent(matchDTOs);
         response.setCurrentPage(page);
         response.setPageSize(pageSize);
         response.setTotalItems(totalMatches);
@@ -126,5 +136,25 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public long countMatches() {
         return matchDAO.countAll();
+    }
+
+    private MatchResponseDTO mapToMatchDTO(Match match) {
+        if (match == null) return null;
+        MatchResponseDTO dto = new MatchResponseDTO();
+        dto.setId(match.getId());
+        dto.setPlayer1(mapToPlayerDTO(match.getPlayer1()));
+        dto.setPlayer2(mapToPlayerDTO(match.getPlayer2()));
+        if (match.getWinner() != null) {
+            dto.setWinner(mapToPlayerDTO(match.getWinner()));
+        }
+        return dto;
+    }
+
+    private PlayerResponseDTO mapToPlayerDTO(Player player) {
+        if (player == null) return null;
+        PlayerResponseDTO dto = new PlayerResponseDTO();
+        dto.setId(player.getId());
+        dto.setName(player.getName());
+        return dto;
     }
 }

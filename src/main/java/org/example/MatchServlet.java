@@ -6,8 +6,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.dto.MatchResponseDTO;
 import org.example.dto.PaginatedResponseDTO;
-import org.example.model.Match;
 import org.example.service.MatchService;
 import org.example.util.JsonUtil;
 
@@ -38,7 +38,7 @@ public class MatchServlet extends HttpServlet {
         int page = (pageParam == null) ? 1 : Integer.parseInt(pageParam);
         int pageSize = (pageSizeParam == null) ? 10 : Integer.parseInt(pageSizeParam);
 
-        PaginatedResponseDTO<Match> paginatedResponse;
+        PaginatedResponseDTO<MatchResponseDTO> paginatedResponse;
 
         if (filterByPlayerName != null && !filterByPlayerName.isBlank()) {
             paginatedResponse = matchService.getPaginatedMatchesByPlayerName(filterByPlayerName, page, pageSize);
