@@ -43,12 +43,15 @@ public class MatchDAOImpl implements MatchDAO {
 
     @Override
     public List<Match> findByPlayerName(String name) {
-        String jpql = "SELECT m FROM Match m WHERE m.player1.name = :playerName OR m.player2.name = :playerName";
+        String jpql = "SELECT m FROM Match m " +
+                "JOIN m.player1 p1 JOIN m.player2 p2 " +
+                "WHERE LOWER(p1.name) LIKE :pattern OR LOWER(p2.name) LIKE :pattern";
 
         try {
             EntityManager manager = HibernateUtil.getEntityManager();
+            String pattern = "%" + name.toLowerCase() + "%";
             return manager.createQuery(jpql, Match.class)
-                    .setParameter("playerName", name)
+                    .setParameter("pattern", pattern)
                     .getResultList();
         } catch (PersistenceException e) {
             throw new DataAccessException("Ошибка поиска матчей по имени игрока: " + name, e);
@@ -86,12 +89,16 @@ public class MatchDAOImpl implements MatchDAO {
     @Override
     public List<Match> findPaginatedByPlayerName(String name, int page, int pageSize) {
         int offset = (page - 1) * pageSize;
-        String jpql = "SELECT m FROM Match m WHERE m.player1.name = :playerName OR m.player2.name = :playerName ORDER BY m.id DESC";
+        String jpql = "SELECT m FROM Match m " +
+                "JOIN m.player1 p1 JOIN m.player2 p2 " +
+                "WHERE LOWER(p1.name) LIKE :pattern OR LOWER(p2.name) LIKE :pattern " +
+                "ORDER BY m.id DESC";
 
         try {
             EntityManager manager = HibernateUtil.getEntityManager();
+            String pattern = "%" + name.toLowerCase() + "%";
             return manager.createQuery(jpql, Match.class)
-                    .setParameter("playerName", name)
+                    .setParameter("pattern", pattern)
                     .setFirstResult(offset)
                     .setMaxResults(pageSize)
                     .getResultList();
@@ -102,12 +109,15 @@ public class MatchDAOImpl implements MatchDAO {
 
     @Override
     public long countByPlayerName(String name) {
-        String jpql = "SELECT COUNT(m) FROM Match m WHERE m.player1.name = :playerName OR m.player2.name = :playerName";
+        String jpql = "SELECT COUNT(m) FROM Match m " +
+                "JOIN m.player1 p1 JOIN m.player2 p2 " +
+                "WHERE LOWER(p1.name) LIKE :pattern OR LOWER(p2.name) LIKE :pattern";
 
         try {
             EntityManager manager = HibernateUtil.getEntityManager();
+            String pattern = "%" + name.toLowerCase() + "%";
             return manager.createQuery(jpql, Long.class)
-                    .setParameter("playerName", name)
+                    .setParameter("pattern", pattern)
                     .getSingleResult();
         } catch (PersistenceException e) {
             throw new DataAccessException("Ошибка подсчета матчей по имени игрока: " + name, e);

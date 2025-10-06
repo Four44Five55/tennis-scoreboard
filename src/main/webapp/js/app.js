@@ -3,10 +3,18 @@ function initMatchesPage() {
 
     const matchesTbody = document.getElementById('matches-tbody');
     const paginationControls = document.getElementById('pagination-controls');
+    const filterInput = document.getElementById('filter-input');
+    const resetFilterBtn = document.getElementById('reset-filter-btn');
+    const searchBtn = document.getElementById('search-btn');
 
-    async function loadMatches(page = 1) {
+    let currentFilter = '';
+
+    async function loadMatches(page = 1, filterQuery = '') {
         try {
-            const url = `/tennis_scoreboard_main_war_exploded/api/matches?page=${page}&pageSize=5`;
+            let url = `/tennis_scoreboard_main_war_exploded/api/matches?page=${page}&pageSize=5`;
+            if (filterQuery) {
+                url += `&filter_by_player_name=${encodeURIComponent(filterQuery)}`;
+            }
             const response = await fetch(url);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
@@ -39,6 +47,12 @@ function initMatchesPage() {
         });
     }
 
+    function performSearch() {
+        const query = filterInput.value.trim();
+        currentFilter = query;
+        loadMatches(1, currentFilter); // Загружаем первую страницу с новым фильтром
+    }
+
     function renderPagination(data) {
         paginationControls.innerHTML = '';
         const {currentPage, totalPages} = data;
@@ -60,11 +74,29 @@ function initMatchesPage() {
         const target = event.target.closest('a[data-page]');
         if (target) {
             const page = parseInt(target.dataset.page, 10);
-            loadMatches(page);
+
+            loadMatches(page, currentFilter);
         }
     });
 
-    loadMatches(1);
+    filterInput.addEventListener('keyup', (event) => {
+        if (event.key === 'Enter') {
+            performSearch();
+        }
+    });
+
+    searchBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        performSearch();
+    });
+
+    resetFilterBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        filterInput.value = '';
+        currentFilter = '';
+        loadMatches(1, currentFilter);
+    });
+    loadMatches(1, currentFilter);
 }
 
 function initNewMatchPage() {
