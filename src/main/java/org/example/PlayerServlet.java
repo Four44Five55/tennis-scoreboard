@@ -6,7 +6,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.exception.DataAccessException;
 import org.example.model.Player;
 import org.example.service.PlayerService;
 import org.example.service.PlayerServiceImpl;
@@ -28,12 +27,9 @@ public class PlayerServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String name = request.getParameter("name");
-        try {
-            Player newPlayer = new Player();
-            newPlayer.setName(name);
-            playerService.createOrUpdatePlayer(newPlayer);
-        } catch (DataAccessException e) {
+        Player newPlayer = new Player();
+        newPlayer.setName(name);
+        playerService.createOrUpdatePlayer(newPlayer);
 
-        }
     }
 }
