@@ -12,7 +12,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 
-public class PlayerDaoImpl implements PlayerDAO {
+public class PlayerDAOImpl implements PlayerDAO {
     @Override
     public void save(Player player) {
         try {
