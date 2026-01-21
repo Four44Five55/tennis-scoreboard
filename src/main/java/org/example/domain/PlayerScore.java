@@ -1,6 +1,7 @@
 package org.example.domain;
 
 import org.example.entity.Player;
+import org.example.exception.ValidationException;
 
 public class PlayerScore {
     private final Player player;
@@ -11,14 +12,13 @@ public class PlayerScore {
 
     public PlayerScore(Player player) {
         if (player == null) {
-            throw new IllegalArgumentException("Player не может быть null");
+            throw new ValidationException("Player не может быть null");
         }
         this.player = player;
         this.point = 0;
         this.game = 0;
         this.set = 0;
     }
-
 
     public int getId() {
         return player.getId();
@@ -29,10 +29,6 @@ public class PlayerScore {
     }
 
     public int getPoints() {
-        return point;
-    }
-
-    public int getPoint() {
         return point;
     }
 
@@ -70,13 +66,12 @@ public class PlayerScore {
     public void resetGames() {
         this.game = 0;
     }
+
     public int getSet() {
         return set;
     }
+
     public void addSet() {
         this.set++;
-    }
-    public void resetSet() {
-        this.set = 0;
     }
 }

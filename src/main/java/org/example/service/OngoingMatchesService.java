@@ -1,12 +1,11 @@
 package org.example.service;
 
-import org.example.dao.MatchDAO;
 import org.example.dao.MatchDAOImpl;
-import org.example.dao.PlayerDAO;
 import org.example.dao.PlayerDAOImpl;
 import org.example.domain.MatchInPlay;
 import org.example.entity.Match;
 import org.example.entity.Player;
+import org.example.exception.ValidationException;
 import org.example.validation.PlayerValidator;
 
 import java.util.Map;
@@ -35,7 +34,7 @@ public class OngoingMatchesService {
         String validatedPlayer2 = PlayerValidator.validateNameQuery(player2Name);
 
         if (validatedPlayer1.equalsIgnoreCase(validatedPlayer2)) {
-            throw new IllegalArgumentException("Игрок не может играть сам с собой.");
+            throw new ValidationException("Игрок не может играть сам с собой.");
         }
 
         Player player1 = getOrCreatePlayer(validatedPlayer1);

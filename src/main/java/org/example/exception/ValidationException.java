@@ -11,6 +11,10 @@ public final class ValidationException extends ApiException {
         super(HttpServletResponse.SC_BAD_REQUEST, "validation_error", message, fieldErrors, null);
     }
 
+    public ValidationException(String message) {
+        this(message, Collections.emptyMap());
+    }
+
     @SuppressWarnings("unchecked")
     public Map<String, String> getFieldErrors() {
         var d = getDetails();

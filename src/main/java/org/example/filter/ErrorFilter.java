@@ -20,25 +20,15 @@ public class ErrorFilter implements Filter {
 
         try {
             chain.doFilter(request, response);
-            // простое сообщения об ошибке.(проверка аргументов на null, на отрицательные значения и т.д.)
-        } catch (IllegalArgumentException e) {
-            if (resp.isCommitted()) throw new ServletException(e);
-            resp.resetBuffer();
-            JsonUtil.sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-            //нужно валидировать внешние данные, вернуть детальный отчет по нескольким полям
-        } catch (ValidationException ve) { // Твое исключение обрабатывается отдельно
+        } catch (ValidationException ve) {
             if (resp.isCommitted()) throw new ServletException(ve);
             resp.resetBuffer();
             JsonUtil.sendValidationErrorResponse(resp, ve.getStatus(), ve.getFieldErrors());
         } catch (ApiException e) {
             if (resp.isCommitted()) throw new ServletException(e);
             resp.resetBuffer();
-            if (e instanceof org.example.exception.ValidationException ve) {
-                JsonUtil.sendValidationErrorResponse(resp, e.getStatus(), ve.getFieldErrors());
-            } else {
-                String msg = (e.getMessage() == null || e.getMessage().isBlank()) ? e.getCode() : e.getMessage();
-                JsonUtil.sendErrorResponse(resp, e.getStatus(), msg);
-            }
+            String msg = (e.getMessage() == null || e.getMessage().isBlank()) ? e.getCode() : e.getMessage();
+            JsonUtil.sendErrorResponse(resp, e.getStatus(), msg);
         } catch (Throwable t) {
             if (resp.isCommitted()) {
                 if (t instanceof ServletException se) throw se;

@@ -30,14 +30,8 @@ public class NewMatchServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/api/match-score?uuid=" + matchUuid);
 
         } catch (ValidationException e) {
-            // Извлекаем первое сообщение об ошибке из карты ошибок
             String errorMessage = e.getFieldErrors().values().stream().findFirst().orElse("Ошибка валидации");
             request.setAttribute("error", errorMessage);
-            request.setAttribute("player1_name", player1Name);
-            request.setAttribute("player2_name", player2Name);
-            request.getRequestDispatcher("/new-match.jsp").forward(request, response);
-        } catch (IllegalArgumentException e) {
-            request.setAttribute("error", e.getMessage());
             request.setAttribute("player1_name", player1Name);
             request.setAttribute("player2_name", player2Name);
             request.getRequestDispatcher("/new-match.jsp").forward(request, response);

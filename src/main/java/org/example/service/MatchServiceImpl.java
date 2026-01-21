@@ -5,9 +5,10 @@ import org.example.dao.PlayerDAO;
 import org.example.dto.MatchResponseDTO;
 import org.example.dto.PaginatedResponseDTO;
 import org.example.dto.PlayerResponseDTO;
-import org.example.exception.NotFoundException;
 import org.example.entity.Match;
 import org.example.entity.Player;
+import org.example.exception.NotFoundException;
+import org.example.exception.ValidationException;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +32,7 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public Match startNewMatch(String player1Name, String player2Name) {
         if (Objects.equals(player1Name, player2Name)) {
-            throw new IllegalArgumentException("Игрок не может играть сам с собой.");
+            throw new ValidationException("Игрок не может играть сам с собой.");
         }
 
         Player player1 = playerDAO.findByName(player1Name)
@@ -58,7 +59,7 @@ public class MatchServiceImpl implements MatchService {
         boolean isWinnerParticipant = Objects.equals(winner.getId(), match.getPlayer1().getId()) ||
                 Objects.equals(winner.getId(), match.getPlayer2().getId());
         if (!isWinnerParticipant) {
-            throw new IllegalArgumentException("Победитель должен быть одним из участников матча.");
+            throw new ValidationException("Победитель должен быть одним из участников матча.");
         }
 
         match.setWinner(winner);
