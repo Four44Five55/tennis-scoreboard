@@ -11,8 +11,8 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
         <!-- 3. Список классов-сущностей -->
-        <class>org.example.model.Player</class>
-        <class>org.example.model.Match</class>
+        <class>org.example.entity.Player</class>
+        <class>org.example.entity.Match</class>
 
         <!-- 4. Свойства для подключения и настройки Hibernate -->
         <properties>

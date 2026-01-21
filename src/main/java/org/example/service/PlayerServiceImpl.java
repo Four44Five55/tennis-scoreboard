@@ -2,7 +2,7 @@ package org.example.service;
 
 import org.example.dao.PlayerDAO;
 import org.example.dao.PlayerDAOImpl;
-import org.example.model.Player;
+import org.example.entity.Player;
 import org.example.validation.PlayerValidator;
 
 import java.util.List;
@@ -18,13 +18,19 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public void createOrUpdatePlayer(Player player) {
         PlayerValidator.validateCreate(player);
-        playerDAO.save(player);
+        Player savedPlayer = playerDAO.save(player);
+        player.setId(savedPlayer.getId());
     }
 
     @Override
     public Optional<Player> getPlayerByName(String name) {
         String valid = PlayerValidator.validateNameQuery(name);
         return playerDAO.findByName(valid);
+    }
+
+    @Override
+    public Optional<Player> getPlayerById(int id) {
+        return playerDAO.findById(id);
     }
 
     @Override

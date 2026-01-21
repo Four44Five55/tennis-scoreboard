@@ -6,7 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.model.Player;
+import org.example.entity.Player;
 import org.example.service.PlayerService;
 import org.example.service.PlayerServiceImpl;
 

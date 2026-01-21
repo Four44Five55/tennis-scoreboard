@@ -6,8 +6,8 @@ import org.example.dto.MatchResponseDTO;
 import org.example.dto.PaginatedResponseDTO;
 import org.example.dto.PlayerResponseDTO;
 import org.example.exception.NotFoundException;
-import org.example.model.Match;
-import org.example.model.Player;
+import org.example.entity.Match;
+import org.example.entity.Player;
 
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +21,11 @@ public class MatchServiceImpl implements MatchService {
     public MatchServiceImpl(MatchDAO matchDAO, PlayerDAO playerDAO) {
         this.matchDAO = matchDAO;
         this.playerDAO = playerDAO;
+    }
+
+    @Override
+    public Match saveMatch(Match match) {
+        return matchDAO.save(match);
     }
 
     @Override
@@ -106,7 +111,6 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public PaginatedResponseDTO<MatchResponseDTO> getPaginatedMatchesByPlayerName(String playerName, int page, int pageSize) {
-        // Валидация
         if (page < 1) page = 1;
         if (pageSize < 1) pageSize = 10;
         if (pageSize > 100) pageSize = 100;

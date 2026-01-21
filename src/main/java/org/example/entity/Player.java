@@ -1,10 +1,12 @@
-package org.example.model;
+package org.example.entity;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "players")
 public class Player {
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -13,6 +15,12 @@ public class Player {
     @Column(name = "name", nullable = false,  unique = true)
     private String name;
 
+    public Player() {
+
+    }
+    public Player(String name) {
+        this.name = name;
+    }
     public Integer getId() {
         return id;
     }

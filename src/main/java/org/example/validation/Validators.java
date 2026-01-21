@@ -2,6 +2,7 @@ package org.example.validation;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,13 +44,17 @@ public final class Validators {
     private static Set<String> loadBadWords() {
         Set<String> words = new HashSet<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                Validators.class.getClassLoader().getResourceAsStream("badwords.txt")))) {
+                Objects.requireNonNull(Validators.class.getClassLoader().getResourceAsStream("badwords.txt")),
+                StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                words.add(line.trim().toLowerCase());  // Add, normalize to lower
+                String trimmed = line.trim().toLowerCase();
+                if (!trimmed.isEmpty() && !trimmed.startsWith("\\")) {
+                    words.add(trimmed);
+                }
             }
         } catch (Exception e) {
-            System.err.println("Ошибка загрузки файла с нецензурной лексикой badwords.txt: " + e.getMessage());  // Or use logger
+            System.err.println("Ошибка загрузки файла с нецензурной лексикой badwords.txt: " + e.getMessage());
         }
         return words;
     }
@@ -58,8 +63,9 @@ public final class Validators {
         if (value == null || value.isBlank() || BAD_WORDS.isEmpty()) return;
 
         String normalized = normalize(value);
+        List<String> tokensList = tokens(normalized);
 
-        for (String token : tokens(normalized)) {
+        for (String token : tokensList) {
             if (BAD_WORDS.contains(token)) {
                 e.add(field, "Недопустимая лексика");
                 return;
@@ -76,12 +82,10 @@ public final class Validators {
     }
 
     private static String normalize(String s) {
-        String x = s.toLowerCase(Locale.ROOT).replace('ё', 'е');
+        String x = s.toLowerCase().replace('ё', 'е');
         x = Normalizer.normalize(x, Normalizer.Form.NFD).replaceAll("\\p{M}+", "");
-        // упрощённая “leet”-нормализация
         x = x.replace('0', 'o').replace('@', 'a').replace('$', 's')
                 .replace('1', 'i').replace('3', 'e').replace('7', 't');
-        // схлопнуть слишком длинные повторы: “ооо” -> “оо”
         return x.replaceAll("(\\p{L})\\1{2,}", "$1$1").trim();
     }
 

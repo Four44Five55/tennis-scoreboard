@@ -5,7 +5,7 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceException;
 import org.example.exception.ConflictException;
 import org.example.exception.DataAccessException;
-import org.example.model.Player;
+import org.example.entity.Player;
 import org.example.util.HibernateUtil;
 import org.hibernate.exception.ConstraintViolationException;
 
@@ -14,10 +14,11 @@ import java.util.Optional;
 
 public class PlayerDAOImpl implements PlayerDAO {
     @Override
-    public void save(Player player) {
+    public Player save(Player player) {
         try {
             EntityManager manager = HibernateUtil.getEntityManager();
-            manager.merge(player);
+            Player mergedPlayer = manager.merge(player);
+            return mergedPlayer;
         } catch (PersistenceException e) {
             if (e.getCause() instanceof ConstraintViolationException) {
                 throw new ConflictException("Дублирование сущности: " + player);
@@ -41,7 +42,7 @@ public class PlayerDAOImpl implements PlayerDAO {
     public Optional<Player> findByName(String name) {
         EntityManager manager = HibernateUtil.getEntityManager();
         try {
-                     Player p = (Player) manager.createQuery("SELECT p FROM Player p WHERE p.name=:name")
+            Player p = (Player) manager.createQuery("SELECT p FROM Player p WHERE p.name=:name")
                     .setParameter("name", name)
                     .getSingleResult();
             return Optional.of(p);
@@ -56,7 +57,6 @@ public class PlayerDAOImpl implements PlayerDAO {
     public List<Player> findAll() {
         EntityManager manager = HibernateUtil.getEntityManager();
         try {
-
             return manager.createQuery("SELECT p FROM Player p", Player.class).getResultList();
         } catch (PersistenceException e) {
             throw new DataAccessException("Ошибка поиска игроков", e);

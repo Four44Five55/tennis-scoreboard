@@ -1,6 +1,6 @@
 package org.example.validation;
 
-import org.example.model.Player;
+import org.example.entity.Player;
 
 public final class PlayerValidator {
     public static final int NAME_MAX = 20;
@@ -8,7 +8,6 @@ public final class PlayerValidator {
     private PlayerValidator() {
     }
 
-    // Создание/обновление — одинаковые правила, либо раздели на два метода при необходимости
     public static void validateCreate(Player p) {
         Errors e = new Errors();
 
@@ -17,17 +16,10 @@ public final class PlayerValidator {
         Validators.maxLen(e, "name", name, NAME_MAX, "Максимум " + NAME_MAX + " символов");
         Validators.validateNoProfanity(e, "name", name);
 
-        // нормализация обратно в сущность (ок для петов)
         p.setName(name);
 
-        e.throwIfAny(); // бросит ValidationException с картой ошибок
+        e.throwIfAny();
     }
-
-    public static void validateUpdate(Player p) {
-        validateCreate(p);
-    }
-
-    // Пример: валидация параметра поиска по имени (если нужно)
     public static String validateNameQuery(String name) {
         Errors e = new Errors();
 

@@ -2,12 +2,14 @@ package org.example.service;
 
 import org.example.dto.MatchResponseDTO;
 import org.example.dto.PaginatedResponseDTO;
-import org.example.model.Match;
+import org.example.entity.Match;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface MatchService {
+
+    Match saveMatch(Match match);
 
     Match startNewMatch(String player1Name, String player2Name);
 

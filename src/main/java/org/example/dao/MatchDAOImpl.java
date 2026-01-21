@@ -3,7 +3,7 @@ package org.example.dao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceException;
 import org.example.exception.DataAccessException;
-import org.example.model.Match;
+import org.example.entity.Match;
 import org.example.util.HibernateUtil;
 
 import java.util.List;
@@ -11,13 +11,14 @@ import java.util.Optional;
 
 public class MatchDAOImpl implements MatchDAO {
     @Override
-    public void save(Match match) {
+    public Match save(Match match) {
         try {
             EntityManager manager = HibernateUtil.getEntityManager();
             manager.merge(match);
         } catch (PersistenceException e) {
             throw new DataAccessException("Ошибка сохранения матча: " + match, e);
         }
+        return match;
     }
 
     @Override
@@ -61,7 +62,7 @@ public class MatchDAOImpl implements MatchDAO {
     @Override
     public List<Match> findPaginated(int page, int pageSize) {
         int offset = (page - 1) * pageSize;
-        String jpql = "SELECT m FROM Match m ORDER BY m.id DESC"; // ВАЖНО: Добавлена сортировка!
+        String jpql = "SELECT m FROM Match m ORDER BY m.id DESC";
 
         try {
             EntityManager manager = HibernateUtil.getEntityManager();

@@ -4,6 +4,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.exception.ApiException;
+import org.example.exception.ValidationException;
 import org.example.util.JsonUtil;
 
 import java.io.IOException;
@@ -19,6 +20,16 @@ public class ErrorFilter implements Filter {
 
         try {
             chain.doFilter(request, response);
+            // простое сообщения об ошибке.(проверка аргументов на null, на отрицательные значения и т.д.)
+        } catch (IllegalArgumentException e) {
+            if (resp.isCommitted()) throw new ServletException(e);
+            resp.resetBuffer();
+            JsonUtil.sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            //нужно валидировать внешние данные, вернуть детальный отчет по нескольким полям
+        } catch (ValidationException ve) { // Твое исключение обрабатывается отдельно
+            if (resp.isCommitted()) throw new ServletException(ve);
+            resp.resetBuffer();
+            JsonUtil.sendValidationErrorResponse(resp, ve.getStatus(), ve.getFieldErrors());
         } catch (ApiException e) {
             if (resp.isCommitted()) throw new ServletException(e);
             resp.resetBuffer();
