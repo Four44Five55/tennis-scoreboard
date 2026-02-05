@@ -18,9 +18,9 @@
         <properties>
             <!-- === Настройки подключения к БД === -->
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:54793/postgres"/>
-            <property name="jakarta.persistence.jdbc.user" value="postgres"/>
-            <property name="jakarta.persistence.jdbc.password" value="password"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:54793/tennis_db"/>
+            <property name="jakarta.persistence.jdbc.user" value="tennis_user"/>
+            <property name="jakarta.persistence.jdbc.password" value="test"/>
 
             <!-- Диалект SQL. Очень важный параметр! -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>

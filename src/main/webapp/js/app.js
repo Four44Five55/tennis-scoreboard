@@ -11,11 +11,16 @@ function initMatchesPage() {
 
     async function loadMatches(page = 1, filterQuery = '') {
         try {
-            let url = `/tennis_scoreboard_main_war_exploded/api/matches?page=${page}&pageSize=5`;
+            const contextPath = window.contextPath || '';
+            let url = `${contextPath}/api/matches?page=${page}&pageSize=5`;
             if (filterQuery) {
                 url += `&filter_by_player_name=${encodeURIComponent(filterQuery)}`;
             }
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
             renderTable(data.content);
@@ -97,11 +102,6 @@ function initMatchesPage() {
         loadMatches(1, currentFilter);
     });
     loadMatches(1, currentFilter);
-}
-
-function initNewMatchPage() {
-    console.log("Initializing New Match Page...");
-
 }
 
 document.addEventListener("DOMContentLoaded", function () {

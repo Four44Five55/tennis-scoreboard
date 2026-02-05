@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 
     <script src="${pageContext.request.contextPath}/js/app.js"></script>
+    <script>
+        window.contextPath = '${pageContext.request.contextPath}';
+    </script>
 </head>
 <body>
 <header class="header">
@@ -24,8 +27,8 @@
         </div>
         <div>
             <nav class="nav-links">
-                <a class="nav-link" href="${pageContext.request.contextPath}/index.jsp">Home</a>
-                <a class="nav-link" href="${pageContext.request.contextPath}/matches.jsp">Matches</a>
+                <a class="nav-link" href="${pageContext.request.contextPath}/">Home</a>
+                <a class="nav-link" href="${pageContext.request.contextPath}/api/matches">Matches</a>
             </nav>
         </div>
     </section>
@@ -41,7 +44,7 @@
                     Start a new match
                 </button>
             </a>
-            <a class="homepage-action-button" href="${pageContext.request.contextPath}/matches.jsp">
+            <a class="homepage-action-button" href="${pageContext.request.contextPath}/api/matches">
                 <button class="btn view-results">
                     View match results
                 </button>

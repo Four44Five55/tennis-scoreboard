@@ -335,8 +335,8 @@ footer {
         width: 100%;
         margin: 0;
         padding-top: 20px;
-        padding-left: 20px;
-        padding-right: 20px;
+        padding-left: 15px;
+        padding-right: 15px;
         box-sizing: border-box;
     }
 
@@ -353,6 +353,8 @@ footer {
         flex-direction: column;
         align-items: flex-start;
         display: none;
+        width: 100%;
+        margin-top: 10px;
     }
 
     .nav-links.active {
@@ -361,6 +363,7 @@ footer {
 
     .nav-link + .nav-link {
         margin-left: 0;
+        margin-top: 10px;
     }
 
     .nav-toggle {
@@ -368,6 +371,57 @@ footer {
         cursor: pointer;
         font-size: 24px;
         margin-left: auto;
+    }
+
+    /* Score table for mobile */
+    .player1, .player2 {
+        font-size: 18px;
+    }
+
+    .player1 td, .player2 td {
+        padding: 15px 3px;
+    }
+
+    .score-btn {
+        font-size: 14px;
+        padding: 8px 12px;
+        margin-right: 0;
+    }
+
+    .table-text {
+        font-size: 14px;
+    }
+
+    /* Matches page */
+    .input-container {
+        flex-direction: column;
+    }
+
+    .input-filter {
+        margin-bottom: 10px;
+    }
+
+    .btn-filter {
+        width: 100%;
+        margin-left: 0;
+        margin-bottom: 10px;
+    }
+
+    .table-matches td {
+        padding: 15px 5px;
+    }
+
+    .table-matches th, .table-matches td {
+        font-size: 14px;
+    }
+
+    .prev, .next {
+        font-size: 24px;
+    }
+
+    .num-page {
+        margin-left: 10px;
+        margin-right: 10px;
     }
 }
 
@@ -381,7 +435,7 @@ footer {
     }
 
     body h1 {
-        font-size: 28px;
+        font-size: 24px;
     }
 
     p {
@@ -389,7 +443,7 @@ footer {
     }
 
     .nav-header {
-        position: absolute;
+        position: relative;
         background-color: white;
         width: 100%;
         padding: 10px 15px;
@@ -400,23 +454,53 @@ footer {
         padding: 0 15px;
         flex-direction: column;
         text-align: center;
-    }
-}
-
-@media (max-width: 768px) {
-    .nav-toggle {
-        display: block;
-        cursor: pointer;
-        font-size: 24px;
+        font-size: 12px;
     }
 
-    .nav-links {
-        display: none;
-        flex-direction: column;
+    /* Score table for small mobile */
+    .table th {
+        font-size: 12px;
+        padding: 3px;
     }
 
-    .nav-links.active {
-        display: flex;
+    .player1, .player2 {
+        font-size: 14px;
+    }
+
+    .player1 td, .player2 td {
+        padding: 10px 2px;
+    }
+
+    .score-btn {
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+    .table-text {
+        font-size: 12px;
+    }
+
+    /* Matches table for small mobile */
+    .table-matches th, .table-matches td {
+        font-size: 12px;
+        padding: 10px 2px;
+    }
+
+    .winner-name-td {
+        width: 50%;
+    }
+
+    /* New match form */
+    .new-match-image {
+        height: 200px;
+    }
+
+    .welcome-image {
+        min-height: 200px;
+    }
+
+    .current-match-image {
+        min-height: 150px;
     }
 }
 

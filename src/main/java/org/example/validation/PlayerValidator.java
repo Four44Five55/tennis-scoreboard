@@ -15,6 +15,8 @@ public final class PlayerValidator {
         Validators.requireNotBlank(e, "name", name, "Имя не может быть пустым");
         Validators.maxLen(e, "name", name, NAME_MAX, "Максимум " + NAME_MAX + " символов");
         Validators.validateNoProfanity(e, "name", name);
+        Validators.notStartNumber(e,"name", name, "Имя не должно начинаться с числа");
+        Validators.isOnlyNumber(e,"name", name, "Имя не должно состоять из чисел");
 
         p.setName(name);
 

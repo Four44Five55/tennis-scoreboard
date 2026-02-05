@@ -16,12 +16,31 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class MatchServiceImpl implements MatchService {
+    private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final int MAX_PAGE_SIZE = 100;
+
     private final MatchDAO matchDAO;
     private final PlayerDAO playerDAO;
 
     public MatchServiceImpl(MatchDAO matchDAO, PlayerDAO playerDAO) {
         this.matchDAO = matchDAO;
         this.playerDAO = playerDAO;
+    }
+
+    /**
+     * Нормализует параметры пагинации.
+     */
+    private int normalizePageSize(int pageSize) {
+        if (pageSize < 1) return DEFAULT_PAGE_SIZE;
+        if (pageSize > MAX_PAGE_SIZE) return MAX_PAGE_SIZE;
+        return pageSize;
+    }
+
+    /**
+     * Нормализует номер страницы.
+     */
+    private int normalizePage(int page) {
+        return page < 1 ? 1 : page;
     }
 
     @Override
@@ -84,55 +103,58 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public PaginatedResponseDTO<MatchResponseDTO> getPaginatedMatches(int page, int pageSize) {
-        if (page < 1) page = 1;
-        if (pageSize < 1) pageSize = 10;
-        if (pageSize > 100) pageSize = 100;
+        int normalizedPage = normalizePage(page);
+        int normalizedPageSize = normalizePageSize(pageSize);
 
-        List<Match> matchesFromDB = matchDAO.findPaginated(page, pageSize);
+        List<Match> matchesFromDB = matchDAO.findPaginated(normalizedPage, normalizedPageSize);
         long totalMatches = matchDAO.countAll();
 
-        List<MatchResponseDTO> matchDTOs = matchesFromDB.stream()
-                .map(this::mapToMatchDTO)
-                .collect(Collectors.toList());
-
-        int totalPages = 0;
-        if (totalMatches > 0) {
-            totalPages = (int) Math.ceil((double) totalMatches / pageSize);
-        }
-
-        PaginatedResponseDTO<MatchResponseDTO> response = new PaginatedResponseDTO<>();
-        response.setContent(matchDTOs);
-        response.setCurrentPage(page);
-        response.setPageSize(pageSize);
-        response.setTotalItems(totalMatches);
-        response.setTotalPages(totalPages);
-
-        return response;
+        return buildPaginatedResponse(
+                matchesFromDB,
+                totalMatches,
+                normalizedPage,
+                normalizedPageSize
+        );
     }
 
     @Override
     public PaginatedResponseDTO<MatchResponseDTO> getPaginatedMatchesByPlayerName(String playerName, int page, int pageSize) {
-        if (page < 1) page = 1;
-        if (pageSize < 1) pageSize = 10;
-        if (pageSize > 100) pageSize = 100;
+        int normalizedPage = normalizePage(page);
+        int normalizedPageSize = normalizePageSize(pageSize);
 
-        List<Match> matchesFromDB = matchDAO.findPaginatedByPlayerName(playerName, page, pageSize);
+        List<Match> matchesFromDB = matchDAO.findPaginatedByPlayerName(playerName, normalizedPage, normalizedPageSize);
         long totalMatches = matchDAO.countByPlayerName(playerName);
 
-        List<MatchResponseDTO> matchDTOs = matchesFromDB.stream()
+        return buildPaginatedResponse(
+                matchesFromDB,
+                totalMatches,
+                normalizedPage,
+                normalizedPageSize
+        );
+    }
+
+    /**
+     * Собирает ответ пагинации из данных БД.
+     */
+    private PaginatedResponseDTO<MatchResponseDTO> buildPaginatedResponse(
+            List<Match> matches,
+            long totalItems,
+            int currentPage,
+            int pageSize
+    ) {
+        List<MatchResponseDTO> matchDTOs = matches.stream()
                 .map(this::mapToMatchDTO)
                 .collect(Collectors.toList());
 
-        int totalPages = 0;
-        if (totalMatches > 0) {
-            totalPages = (int) Math.ceil((double) totalMatches / pageSize);
-        }
+        int totalPages = (totalItems > 0)
+                ? (int) Math.ceil((double) totalItems / pageSize)
+                : 0;
 
         PaginatedResponseDTO<MatchResponseDTO> response = new PaginatedResponseDTO<>();
         response.setContent(matchDTOs);
-        response.setCurrentPage(page);
+        response.setCurrentPage(currentPage);
         response.setPageSize(pageSize);
-        response.setTotalItems(totalMatches);
+        response.setTotalItems(totalItems);
         response.setTotalPages(totalPages);
 
         return response;

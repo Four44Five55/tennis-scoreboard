@@ -5,7 +5,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.domain.MatchInPlay;
+import org.example.dto.MatchScoreDTO;
+import org.example.exception.ValidationException;
 import org.example.service.OngoingMatchesService;
 
 import java.io.IOException;
@@ -26,20 +27,18 @@ public class MatchScoreServlet extends HttpServlet {
                 return;
             }
             UUID matchId = UUID.fromString(uuidParam);
-            Optional<MatchInPlay> matchOptional = ongoingMatchesService.getMatchInPlay(matchId);
+            Optional<MatchScoreDTO> matchDTO = ongoingMatchesService.getMatchScoreDTO(matchId);
 
-            if (matchOptional.isEmpty()) {
+            if (matchDTO.isEmpty()) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Текущий матч с UUID " + matchId + " не найден или завершен.");
                 return;
             }
 
-            MatchInPlay currentMatch = matchOptional.get();
-
-            req.setAttribute("currentMatch", currentMatch);
+            req.setAttribute("matchDTO", matchDTO.get());
 
             req.getRequestDispatcher("/match-score.jsp").forward(req, resp);
 
-        } catch (IllegalArgumentException e) {
+        } catch (ValidationException e) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Неверный формат UUID матча.");
         }
     }
@@ -70,13 +69,13 @@ public class MatchScoreServlet extends HttpServlet {
 
             if (finishedMatch.isPresent()) {
                 // Матч завершён - перенаправляем на список матчей
-                resp.sendRedirect(req.getContextPath() + "/matches.jsp");
+                resp.sendRedirect(req.getContextPath() + "/api/matches");
             } else {
                 // Матч продолжается - остаёмся на странице счёта
                 resp.sendRedirect(req.getContextPath() + "/api/match-score?uuid=" + uuidParam);
             }
 
-        } catch (IllegalArgumentException e) {
+        } catch (ValidationException e) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Неверный формат параметров: " + e.getMessage());
         }
     }

@@ -33,6 +33,13 @@ public final class Validators {
         if (value != null && !allowed.contains(value)) e.add(field, msg);
     }
 
+    public static void notStartNumber(Errors e, String field, String value, String msg) {
+        if (value != null && Character.isDigit(value.charAt(0))) e.add(field, msg);
+    }
+    public static void isOnlyNumber(Errors e, String field, String value, String msg) {
+        if (value != null && value.matches("\\d+")) e.add(field, msg);
+    }
+
     public static void requirePositiveInt(Errors e, String field, String value, String msg) {
         try {
             if (Integer.parseInt(value) <= 0) e.add(field, msg);

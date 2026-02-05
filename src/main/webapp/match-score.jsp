@@ -1,4 +1,3 @@
-<jsp:useBean id="currentMatch" scope="request" type="org.example.domain.MatchInPlay"/>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -14,6 +13,9 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 
     <script src="${pageContext.request.contextPath}/js/app.js"></script>
+    <script>
+        window.contextPath = '${pageContext.request.contextPath}';
+    </script>
 </head>
 <body>
 <header class="header">
@@ -26,8 +28,8 @@
         </div>
         <div>
             <nav class="nav-links">
-                <a class="nav-link" href="${pageContext.request.contextPath}/index.jsp">Home</a>
-                <a class="nav-link" href="${pageContext.request.contextPath}/matches.jsp">Matches</a>
+                <a class="nav-link" href="${pageContext.request.contextPath}/">Home</a>
+                <a class="nav-link" href="${pageContext.request.contextPath}/api/matches">Matches</a>
             </nav>
         </div>
     </section>
@@ -49,10 +51,10 @@
                 </thead>
                 <tbody>
                 <tr class="player1">
-                    <td class="table-text">${currentMatch.player1.name}</td>
-                    <td class="table-text">${currentMatch.player1.set}</td>
-                    <td class="table-text">${currentMatch.player1.games}</td>
-                    <td class="table-text">${currentMatch.player1DisplayPoints}</td>
+                    <td class="table-text">${matchDTO.player1.name}</td>
+                    <td class="table-text">${matchDTO.player1.sets}</td>
+                    <td class="table-text">${matchDTO.player1.games}</td>
+                    <td class="table-text">${matchDTO.player1.displayPoints}</td>
                     <td class="table-text">
                         <form action="${pageContext.request.contextPath}/api/match-score" method="post">
                             <input type="hidden" name="uuid" value="${param.uuid}"/>
@@ -62,10 +64,10 @@
                     </td>
                 </tr>
                 <tr class="player2">
-                    <td class="table-text">${currentMatch.player2.name}</td>
-                    <td class="table-text">${currentMatch.player2.set}</td>
-                    <td class="table-text">${currentMatch.player2.games}</td>
-                    <td class="table-text">${currentMatch.player2DisplayPoints}</td>
+                    <td class="table-text">${matchDTO.player2.name}</td>
+                    <td class="table-text">${matchDTO.player2.sets}</td>
+                    <td class="table-text">${matchDTO.player2.games}</td>
+                    <td class="table-text">${matchDTO.player2.displayPoints}</td>
                     <td class="table-text">
                         <form action="${pageContext.request.contextPath}/api/match-score" method="post">
                             <input type="hidden" name="uuid" value="${param.uuid}"/>

@@ -3,6 +3,8 @@ package org.example.service;
 import org.example.dao.MatchDAOImpl;
 import org.example.dao.PlayerDAOImpl;
 import org.example.domain.MatchInPlay;
+import org.example.dto.MatchScoreDTO;
+import org.example.dto.PlayerScoreDTO;
 import org.example.entity.Match;
 import org.example.entity.Player;
 import org.example.exception.ValidationException;
@@ -58,6 +60,33 @@ public class OngoingMatchesService {
 
     public Optional<MatchInPlay> getMatchInPlay(UUID matchInPlayId) {
         return Optional.ofNullable(ongoingMatchesInPlay.get(matchInPlayId));
+    }
+
+    /**
+     * Возвращает DTO с данными о матче для отображения в JSP.
+     * Скрывает внутреннюю структуру domain-сущности MatchInPlay.
+     */
+    public Optional<MatchScoreDTO> getMatchScoreDTO(UUID matchInPlayId) {
+        return getMatchInPlay(matchInPlayId)
+                .map(this::toMatchScoreDTO);
+    }
+
+    private MatchScoreDTO toMatchScoreDTO(MatchInPlay match) {
+        PlayerScoreDTO player1DTO = new PlayerScoreDTO(
+                match.getPlayer1().getName(),
+                match.getPlayer1().getSet(),
+                match.getPlayer1().getGames(),
+                match.getPlayer1DisplayPoints()
+        );
+
+        PlayerScoreDTO player2DTO = new PlayerScoreDTO(
+                match.getPlayer2().getName(),
+                match.getPlayer2().getSet(),
+                match.getPlayer2().getGames(),
+                match.getPlayer2DisplayPoints()
+        );
+
+        return new MatchScoreDTO(player1DTO, player2DTO);
     }
 
     public void removeMatchInPlay(UUID matchInPlayId) {

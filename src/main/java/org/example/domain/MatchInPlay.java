@@ -18,32 +18,12 @@ public class MatchInPlay {
         return player1;
     }
 
-    public void setPlayer1(PlayerScore player1) {
-        this.player1 = player1;
-    }
-
     public PlayerScore getPlayer2() {
         return player2;
     }
 
-    public void setPlayer2(PlayerScore player2) {
-        this.player2 = player2;
-    }
-
-    public boolean isTieBreak() {
-        return isTieBreak;
-    }
-
-    public void setTieBreak(boolean tieBreak) {
-        isTieBreak = tieBreak;
-    }
-
     public boolean isFinished() {
         return isFinished;
-    }
-
-    public void setFinished(boolean finished) {
-        isFinished = finished;
     }
 
     public int getIdWinner() {
@@ -70,6 +50,10 @@ public class MatchInPlay {
         int p1Points = player.getPoints();
         int p2Points = opponent.getPoints();
 
+        if (isTieBreak) {
+            return String.valueOf(player.getPoints());
+        }
+
         // Оба игрока имеют >= 3 очка (40+)
         if (p1Points >= 3 && p2Points >= 3) {
             if (p1Points == p2Points) {
@@ -83,9 +67,6 @@ public class MatchInPlay {
         return player.getDisplayPoints();
     }
 
-    public void setIdWinner(int idWinner) {
-        this.idWinner = idWinner;
-    }
 
     public void addPoint(int playerNum) {
         if (isFinished) {
@@ -130,6 +111,8 @@ public class MatchInPlay {
         // Тай-брейк при 6-6
         if (scorer.getGames() == 6 && opponent.getGames() == 6) {
             isTieBreak = true;
+            player1.resetPoints();
+            player2.resetPoints();
             return false;
         }
 
