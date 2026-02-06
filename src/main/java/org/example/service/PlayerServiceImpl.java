@@ -17,14 +17,14 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public void createOrUpdatePlayer(Player player) {
-        PlayerValidator.validateCreate(player);
+        PlayerValidator.validateName(player.getName());
         Player savedPlayer = playerDAO.save(player);
         player.setId(savedPlayer.getId());
     }
 
     @Override
     public Optional<Player> getPlayerByName(String name) {
-        String valid = PlayerValidator.validateNameQuery(name);
+        String valid = PlayerValidator.validateName(name);
         return playerDAO.findByName(valid);
     }
 

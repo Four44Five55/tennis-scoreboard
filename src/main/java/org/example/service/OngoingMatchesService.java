@@ -32,15 +32,15 @@ public class OngoingMatchesService {
 
     public UUID startMatchInPlay(String player1Name, String player2Name) {
         // Валидация имён (пустота, длина, недопустимая лексика)
-        String validatedPlayer1 = PlayerValidator.validateNameQuery(player1Name);
-        String validatedPlayer2 = PlayerValidator.validateNameQuery(player2Name);
+        PlayerValidator.validateName(player1Name);
+        PlayerValidator.validateName(player2Name);
 
-        if (validatedPlayer1.equalsIgnoreCase(validatedPlayer2)) {
+        if (player1Name.equalsIgnoreCase(player2Name)) {
             throw new ValidationException("Игрок не может играть сам с собой.");
         }
 
-        Player player1 = getOrCreatePlayer(validatedPlayer1);
-        Player player2 = getOrCreatePlayer(validatedPlayer2);
+        Player player1 = getOrCreatePlayer(player1Name);
+        Player player2 = getOrCreatePlayer(player2Name);
 
         UUID matchInPlayId = UUID.randomUUID();
         MatchInPlay newGame = new MatchInPlay(player1, player2);
