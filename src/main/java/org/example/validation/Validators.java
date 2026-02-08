@@ -34,7 +34,7 @@ public final class Validators {
     }
 
     public static void notStartNumber(Errors e, String field, String value, String msg) {
-        if (value != null && Character.isDigit(value.charAt(0))) e.add(field, msg);
+        if (value != null && !value.isEmpty() && Character.isDigit(value.charAt(0))) e.add(field, msg);
     }
     public static void isOnlyNumber(Errors e, String field, String value, String msg) {
         if (value != null && value.matches("\\d+")) e.add(field, msg);

@@ -37,4 +37,12 @@ war {
 }
 test {
     useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+
+    afterTest { desc, result ->
+        println "${desc.displayName}: ${result.resultType}"
+    }
 }

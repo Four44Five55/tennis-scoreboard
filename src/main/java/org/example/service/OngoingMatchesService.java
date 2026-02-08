@@ -31,7 +31,6 @@ public class OngoingMatchesService {
     }
 
     public UUID startMatchInPlay(String player1Name, String player2Name) {
-        // Валидация имён (пустота, длина, недопустимая лексика)
         PlayerValidator.validateName(player1Name);
         PlayerValidator.validateName(player2Name);
 
