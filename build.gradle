@@ -26,6 +26,8 @@ dependencies {
 
     runtimeOnly 'ch.qos.logback:logback-classic:1.5.13'
 
+    implementation 'org.apache.tomcat:tomcat-jsp-api:11.0.0-M13'
+
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
@@ -35,4 +37,12 @@ war {
 }
 test {
     useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+
+    afterTest { desc, result ->
+        println "${desc.displayName}: ${result.resultType}"
+    }
 }

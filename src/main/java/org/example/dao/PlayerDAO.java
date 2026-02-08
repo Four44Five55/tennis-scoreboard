@@ -1,12 +1,12 @@
 package org.example.dao;
 
-import org.example.model.Player;
+import org.example.entity.Player;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface PlayerDAO {
-    void save(Player player);
+    Player save(Player player);
 
     Optional<Player> findById(int id);
 

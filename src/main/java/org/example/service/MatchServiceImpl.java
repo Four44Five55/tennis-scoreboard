@@ -5,9 +5,10 @@ import org.example.dao.PlayerDAO;
 import org.example.dto.MatchResponseDTO;
 import org.example.dto.PaginatedResponseDTO;
 import org.example.dto.PlayerResponseDTO;
+import org.example.entity.Match;
+import org.example.entity.Player;
 import org.example.exception.NotFoundException;
-import org.example.model.Match;
-import org.example.model.Player;
+import org.example.exception.ValidationException;
 
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +16,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class MatchServiceImpl implements MatchService {
+    private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final int MAX_PAGE_SIZE = 100;
+
     private final MatchDAO matchDAO;
     private final PlayerDAO playerDAO;
 
@@ -23,10 +27,31 @@ public class MatchServiceImpl implements MatchService {
         this.playerDAO = playerDAO;
     }
 
+    /**
+     * Нормализует параметры пагинации.
+     */
+    private int normalizePageSize(int pageSize) {
+        if (pageSize < 1) return DEFAULT_PAGE_SIZE;
+        if (pageSize > MAX_PAGE_SIZE) return MAX_PAGE_SIZE;
+        return pageSize;
+    }
+
+    /**
+     * Нормализует номер страницы.
+     */
+    private int normalizePage(int page) {
+        return page < 1 ? 1 : page;
+    }
+
+    @Override
+    public Match saveMatch(Match match) {
+        return matchDAO.save(match);
+    }
+
     @Override
     public Match startNewMatch(String player1Name, String player2Name) {
         if (Objects.equals(player1Name, player2Name)) {
-            throw new IllegalArgumentException("Игрок не может играть сам с собой.");
+            throw new ValidationException("Игрок не может играть сам с собой.");
         }
 
         Player player1 = playerDAO.findByName(player1Name)
@@ -53,7 +78,7 @@ public class MatchServiceImpl implements MatchService {
         boolean isWinnerParticipant = Objects.equals(winner.getId(), match.getPlayer1().getId()) ||
                 Objects.equals(winner.getId(), match.getPlayer2().getId());
         if (!isWinnerParticipant) {
-            throw new IllegalArgumentException("Победитель должен быть одним из участников матча.");
+            throw new ValidationException("Победитель должен быть одним из участников матча.");
         }
 
         match.setWinner(winner);
@@ -78,56 +103,58 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public PaginatedResponseDTO<MatchResponseDTO> getPaginatedMatches(int page, int pageSize) {
-        if (page < 1) page = 1;
-        if (pageSize < 1) pageSize = 10;
-        if (pageSize > 100) pageSize = 100;
+        int normalizedPage = normalizePage(page);
+        int normalizedPageSize = normalizePageSize(pageSize);
 
-        List<Match> matchesFromDB = matchDAO.findPaginated(page, pageSize);
+        List<Match> matchesFromDB = matchDAO.findPaginated(normalizedPage, normalizedPageSize);
         long totalMatches = matchDAO.countAll();
 
-        List<MatchResponseDTO> matchDTOs = matchesFromDB.stream()
-                .map(this::mapToMatchDTO)
-                .collect(Collectors.toList());
-
-        int totalPages = 0;
-        if (totalMatches > 0) {
-            totalPages = (int) Math.ceil((double) totalMatches / pageSize);
-        }
-
-        PaginatedResponseDTO<MatchResponseDTO> response = new PaginatedResponseDTO<>();
-        response.setContent(matchDTOs);
-        response.setCurrentPage(page);
-        response.setPageSize(pageSize);
-        response.setTotalItems(totalMatches);
-        response.setTotalPages(totalPages);
-
-        return response;
+        return buildPaginatedResponse(
+                matchesFromDB,
+                totalMatches,
+                normalizedPage,
+                normalizedPageSize
+        );
     }
 
     @Override
     public PaginatedResponseDTO<MatchResponseDTO> getPaginatedMatchesByPlayerName(String playerName, int page, int pageSize) {
-        // Валидация
-        if (page < 1) page = 1;
-        if (pageSize < 1) pageSize = 10;
-        if (pageSize > 100) pageSize = 100;
+        int normalizedPage = normalizePage(page);
+        int normalizedPageSize = normalizePageSize(pageSize);
 
-        List<Match> matchesFromDB = matchDAO.findPaginatedByPlayerName(playerName, page, pageSize);
+        List<Match> matchesFromDB = matchDAO.findPaginatedByPlayerName(playerName, normalizedPage, normalizedPageSize);
         long totalMatches = matchDAO.countByPlayerName(playerName);
 
-        List<MatchResponseDTO> matchDTOs = matchesFromDB.stream()
+        return buildPaginatedResponse(
+                matchesFromDB,
+                totalMatches,
+                normalizedPage,
+                normalizedPageSize
+        );
+    }
+
+    /**
+     * Собирает ответ пагинации из данных БД.
+     */
+    private PaginatedResponseDTO<MatchResponseDTO> buildPaginatedResponse(
+            List<Match> matches,
+            long totalItems,
+            int currentPage,
+            int pageSize
+    ) {
+        List<MatchResponseDTO> matchDTOs = matches.stream()
                 .map(this::mapToMatchDTO)
                 .collect(Collectors.toList());
 
-        int totalPages = 0;
-        if (totalMatches > 0) {
-            totalPages = (int) Math.ceil((double) totalMatches / pageSize);
-        }
+        int totalPages = (totalItems > 0)
+                ? (int) Math.ceil((double) totalItems / pageSize)
+                : 0;
 
         PaginatedResponseDTO<MatchResponseDTO> response = new PaginatedResponseDTO<>();
         response.setContent(matchDTOs);
-        response.setCurrentPage(page);
+        response.setCurrentPage(currentPage);
         response.setPageSize(pageSize);
-        response.setTotalItems(totalMatches);
+        response.setTotalItems(totalItems);
         response.setTotalPages(totalPages);
 
         return response;

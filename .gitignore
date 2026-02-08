@@ -36,3 +36,4 @@ database.properties
 # Compiled classes
 *.class
 
+/.env

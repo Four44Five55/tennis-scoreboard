@@ -30,12 +30,16 @@ public class MatchServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
         String pageParam = request.getParameter("page");
         String pageSizeParam = request.getParameter("pageSize");
         String filterByPlayerName = request.getParameter("filter_by_player_name");
-
-        int page = (pageParam == null) ? 1 : Integer.parseInt(pageParam);
+        int page;
+        try {
+            page = (pageParam == null) ? 1 : Integer.parseInt(pageParam);
+            if (page < 1) page = 1;
+        } catch (NumberFormatException e) {
+            page = 1;
+        }
         int pageSize = (pageSizeParam == null) ? 10 : Integer.parseInt(pageSizeParam);
 
         PaginatedResponseDTO<MatchResponseDTO> paginatedResponse;
@@ -45,6 +49,14 @@ public class MatchServlet extends HttpServlet {
         } else {
             paginatedResponse = matchService.getPaginatedMatches(page, pageSize);
         }
-        JsonUtil.sendJsonResponse(response, HttpServletResponse.SC_OK, paginatedResponse);
+
+        // Если запрос expects JSON (AJAX) - возвращаем JSON
+        String acceptHeader = request.getHeader("Accept");
+        if (acceptHeader != null && acceptHeader.contains("application/json")) {
+            JsonUtil.sendJsonResponse(response, HttpServletResponse.SC_OK, paginatedResponse);
+        } else {
+            // Иначе - показываем HTML страницу
+            request.getRequestDispatcher("/matches.jsp").forward(request, response);
+        }
     }
 }

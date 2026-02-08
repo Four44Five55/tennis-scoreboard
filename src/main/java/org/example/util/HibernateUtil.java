@@ -7,6 +7,9 @@ import org.example.exception.InitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public final class HibernateUtil {
     private static final Logger logger = LoggerFactory.getLogger(HibernateUtil.class);
@@ -19,7 +22,23 @@ public final class HibernateUtil {
     public static synchronized void initialize() {
         if (managerFactory == null || !managerFactory.isOpen()) {
             try {
-                managerFactory = Persistence.createEntityManagerFactory("tennis");
+                Map<String, String> properties = new HashMap<>();
+
+                String dbUrl = System.getenv("DB_URL");
+                if (dbUrl != null) {
+                    properties.put("jakarta.persistence.jdbc.url", dbUrl);
+                }
+
+                String dbUser = System.getenv("DB_USER");
+                if (dbUser != null) {
+                    properties.put("jakarta.persistence.jdbc.user", dbUser);
+                }
+
+                String dbPassword = System.getenv("DB_PASSWORD");
+                if (dbPassword != null) {
+                    properties.put("jakarta.persistence.jdbc.password", dbPassword);
+                }
+                managerFactory = Persistence.createEntityManagerFactory("tennis", properties);
                 logger.info("Инициализация EntityManagerFactory.");
             } catch (Exception e) {
                 logger.error("Ошибка инициализации EntityManagerFactory.", e);
